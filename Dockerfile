@@ -8,8 +8,6 @@ ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
 
 ENV NGINX_VERSION 1.12.0
 
-ENV THRIFT_VERSION 0.10.0
-
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
     apk add --update nginx && \
     echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
@@ -22,9 +20,6 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
     curl \
     libcurl \
     git \
-    python \
-    python-dev \
-    py-pip \
     augeas-dev \
     openssl-dev \
     ca-certificates \
@@ -60,21 +55,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
     php -r "unlink('composer-setup.php');"  && \
     apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev
 
-# Install Thrift
-RUN apk add --update gcc g++ make automake autoconf bison flex && \
-    curl -fSL http://mirror.cc.columbia.edu/pub/software/apache/thrift/$THRIFT_VERSION/thrift-$THRIFT_VERSION.tar.gz -o thrift.tar.gz && \
-    tar -zxC /usr/src -f thrift.tar.gz && \
-    rm thrift.tar.gz && \
-    cd /usr/src/thrift-$THRIFT_VERSION && \
-    ./configure --without-python && \
-    make && \
-    make install && \
-    rm -rf /usr/src/thrift-$THRIFT_VERSION && \
-    apk del gcc g++ make automake autoconf bison flex &&\
-# Install Redis
-    apk add --update redis
-
 ADD conf/supervisord.conf /etc/supervisord.conf
+ADD conf/supervisor/ /etc/supervisor/conf.d/
 
 # Copy our nginx config
 RUN rm -Rf /etc/nginx/nginx.conf
@@ -121,7 +103,6 @@ ADD scripts/start.sh /start.sh
 ADD scripts/pull /usr/bin/pull
 ADD scripts/push /usr/bin/push
 RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh
-
 
 ADD src/ /var/www/html/
 
