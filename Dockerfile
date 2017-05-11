@@ -6,14 +6,12 @@ ENV php_conf /usr/local/etc/php-fpm.conf
 ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf
 ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
 
-ENV NGINX_VERSION 1.12.0
-
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
-    apk add --update nginx && \
-    echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
+RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
 # uncomment following if you are in China
 #    sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
-    apk add --update --no-cache bash \
+    apk add --update --no-cache \
+    nginx \
+    bash \
     openssh-client \
     wget \
     supervisor \
@@ -96,7 +94,6 @@ RUN echo "cgi.fix_pathinfo=0" > ${php_vars} &&\
         -e "s/listen = 127.0.0.1:9000/listen = \/var\/run\/php-fpm.sock/g" \
         -e "s/^;clear_env = no$/clear_env = no/" \
         ${fpm_conf}
-
 
 # Add Scripts
 ADD scripts/start.sh /start.sh
