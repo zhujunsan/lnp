@@ -2,6 +2,8 @@ FROM php:7.1.4-fpm-alpine
 
 MAINTAINER San <zhujunsan@gmail.com>
 
+ENV PHP_EXT_PHPIREDIS 1.0.0
+
 ENV php_conf /usr/local/etc/php-fpm.conf
 ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf
 ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
@@ -33,14 +35,18 @@ RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/
     libffi-dev \
     freetype-dev \
     sqlite-dev \
-    libjpeg-turbo-dev && \
+    libjpeg-turbo-dev \
+    hiredis-dev && \
+    curl -fSL https://github.com/nrk/phpiredis/archive/v$PHP_EXT_PHPIREDIS.tar.gz -o phpiredis.tar.gz && \
+    tar -zxC /usr/src/php/ext -f phpiredis.tar.gz && \
+    rm phpiredis.tar.gz && \
     docker-php-ext-configure gd \
       --with-gd \
       --with-freetype-dir=/usr/include/ \
       --with-png-dir=/usr/include/ \
       --with-jpeg-dir=/usr/include/ && \
     #curl iconv session
-    docker-php-ext-install pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache && \
+    docker-php-ext-install -j4 phpiredis pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache && \
     docker-php-source delete && \
     mkdir -p /etc/nginx && \
     mkdir -p /var/www/app && \
@@ -51,7 +57,12 @@ RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/
     php -r "if (hash_file('SHA384', 'composer-setup.php') === '${EXPECTED_COMPOSER_SIGNATURE}') { echo 'Composer.phar Installer verified'; } else { echo 'Composer.phar Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
     php composer-setup.php --install-dir=/usr/bin --filename=composer && \
     php -r "unlink('composer-setup.php');"  && \
-    apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev
+    apk del --purge \
+    gcc \
+    musl-dev \
+    linux-headers \
+    libffi-dev \
+    augeas-dev
 
 ADD conf/supervisord.conf /etc/supervisord.conf
 ADD conf/supervisor/ /etc/supervisor/conf.d/
