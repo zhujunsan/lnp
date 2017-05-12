@@ -10,7 +10,7 @@ ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
 
 RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
 # uncomment following if you are in China
-#    sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
+#    sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk add --update --no-cache \
     nginx \
     bash \
@@ -24,7 +24,6 @@ RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/
     openssl-dev \
     ca-certificates \
     dialog \
-    gcc \
     musl-dev \
     linux-headers \
     libmcrypt-dev \
@@ -37,14 +36,15 @@ RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/
     sqlite-dev \
     libjpeg-turbo-dev \
     hiredis-dev && \
-    curl -fSL https://github.com/nrk/phpiredis/archive/v$PHP_EXT_PHPIREDIS.tar.gz -o phpiredis.tar.gz && \
-    tar -zxC /usr/src/php/ext -f phpiredis.tar.gz && \
-    rm phpiredis.tar.gz && \
     docker-php-ext-configure gd \
       --with-gd \
       --with-freetype-dir=/usr/include/ \
       --with-png-dir=/usr/include/ \
       --with-jpeg-dir=/usr/include/ && \
+    curl -fSL https://github.com/nrk/phpiredis/archive/v$PHP_EXT_PHPIREDIS.tar.gz -o phpiredis.tar.gz && \
+    tar -zxC /usr/src/php/ext -f phpiredis.tar.gz && \
+    mv /usr/src/php/ext/phpiredis-$PHP_EXT_PHPIREDIS/ /usr/src/php/ext/phpiredis && \
+    rm phpiredis.tar.gz && \
     #curl iconv session
     docker-php-ext-install -j4 phpiredis pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache && \
     docker-php-source delete && \
