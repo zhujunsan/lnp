@@ -35,6 +35,7 @@ RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/
     freetype-dev \
     sqlite-dev \
     libjpeg-turbo-dev \
+    pcre-dev \
     hiredis-dev && \
     docker-php-ext-configure gd \
       --with-gd \
