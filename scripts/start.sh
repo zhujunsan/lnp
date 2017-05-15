@@ -62,7 +62,11 @@ fi
 
 # Try auto install for composer
 if [ -f "/var/www/html/composer.lock" ]; then
-  composer install --dev --prefer-dist --no-progress --working-dir=/var/www/html
+  if [ ! -z "$ON_PRODUCTION" ]; then
+    composer install --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest --working-dir=/var/www/html
+  else
+    composer install --dev --prefer-dist --no-progress --no-interaction --working-dir=/var/www/html
+  fi
 fi
 
 # Enable custom nginx config files if they exist
@@ -75,21 +79,21 @@ if [ -f /var/www/html/conf/nginx/nginx-site-ssl.conf ]; then
 fi
 
 # Display PHP error's or not
-if [[ "$ERRORS" != "1" ]] ; then
+if [[ "$ERRORS" != "1" ]]; then
  echo php_flag[display_errors] = off >> /usr/local/etc/php-fpm.conf
 else
  echo php_flag[display_errors] = on >> /usr/local/etc/php-fpm.conf
 fi
 
 # Display Version Details or not
-if [[ "$HIDE_NGINX_HEADERS" == "0" ]] ; then
+if [[ "$HIDE_NGINX_HEADERS" == "0" ]]; then
  sed -i "s/server_tokens off;/server_tokens on;/g" /etc/nginx/nginx.conf
 else
  sed -i "s/expose_php = On/expose_php = Off/g" /usr/local/etc/php-fpm.conf
 fi
 
 # Pass real-ip to logs when behind ELB, etc
-if [[ "$REAL_IP_HEADER" == "1" ]] ; then
+if [[ "$REAL_IP_HEADER" == "1" ]]; then
  sed -i "s/#real_ip_header X-Forwarded-For;/real_ip_header X-Forwarded-For;/" /etc/nginx/sites-available/default.conf
  sed -i "s/#set_real_ip_from/set_real_ip_from/" /etc/nginx/sites-available/default.conf
  if [ ! -z "$REAL_IP_FROM" ]; then
@@ -98,7 +102,7 @@ if [[ "$REAL_IP_HEADER" == "1" ]] ; then
 fi
 # Do the same for SSL sites
 if [ -f /etc/nginx/sites-available/default-ssl.conf ]; then
- if [[ "$REAL_IP_HEADER" == "1" ]] ; then
+ if [[ "$REAL_IP_HEADER" == "1" ]]; then
   sed -i "s/#real_ip_header X-Forwarded-For;/real_ip_header X-Forwarded-For;/" /etc/nginx/sites-available/default-ssl.conf
   sed -i "s/#set_real_ip_from/set_real_ip_from/" /etc/nginx/sites-available/default-ssl.conf
   if [ ! -z "$REAL_IP_FROM" ]; then
@@ -135,7 +139,7 @@ else
 fi
 
 # Run custom scripts
-if [[ "$RUN_SCRIPTS" == "1" ]] ; then
+if [[ "$RUN_SCRIPTS" == "1" ]]; then
   if [ -d "/var/www/html/scripts/" ]; then
     # make scripts executable incase they aren't
     chmod -Rf 750 /var/www/html/scripts/*

@@ -1,4 +1,4 @@
-FROM php:7.1.4-fpm-alpine
+FROM php:7.1.5-fpm-alpine
 
 MAINTAINER San <zhujunsan@gmail.com>
 
