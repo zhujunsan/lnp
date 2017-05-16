@@ -39,7 +39,7 @@ if [ ! -d "/var/www/html/.git" ]; then
    if [ ! -z ${REMOVE_FILES} ] && [ ${REMOVE_FILES} == 0 ]; then
      echo "skiping removal of files"
    else
-     rm -Rf /var/www/html/*
+     rm -rf /var/www/html/*
    fi
    GIT_COMMAND='git clone '
    if [ ! -z "$GIT_BRANCH" ]; then
@@ -152,4 +152,3 @@ fi
 
 # Start supervisord and services
 exec /usr/bin/supervisord -n -c /etc/supervisord.conf
-

@@ -17,6 +17,7 @@ RUN echo @testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/
     openssh-client \
     wget \
     supervisor \
+    tzdata \
     curl \
     libcurl \
     git \
