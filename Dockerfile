@@ -70,8 +70,9 @@ ADD conf/supervisord.conf /etc/supervisord.conf
 ADD conf/supervisor/ /etc/supervisor/conf.d/
 
 # Copy our nginx config
-RUN rm -Rf /etc/nginx/nginx.conf
+RUN rm -Rf /etc/nginx/nginx.conf /etc/nginx/mime.types
 ADD conf/nginx.conf /etc/nginx/nginx.conf
+ADD conf/mime.types /etc/nginx/mime.types
 
 # nginx site conf
 RUN mkdir -p /etc/nginx/sites-available/ && \
