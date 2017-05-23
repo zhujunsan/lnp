@@ -62,28 +62,15 @@ fi
 
 # Try auto install for composer
 if [ -f "/var/www/html/composer.lock" ]; then
-  if [ ! -z "$ON_PRODUCTION" ]; then
-    composer install --optimize-autoloader --prefer-dist --no-progress --no-interaction --no-suggest --working-dir=/var/www/html
-  else
-    composer install --dev --prefer-dist --no-progress --no-interaction --working-dir=/var/www/html
-  fi
+  composer install --dev --prefer-dist --no-progress --no-interaction --working-dir=/var/www/html
 fi
 
 # Enable custom nginx config files if they exist
-if [ ! -z "$ON_PRODUCTION" ]; then
-  if [ -f /var/www/html/conf/nginx/nginx-site-production.conf ]; then
-    cp /var/www/html/conf/nginx/nginx-site-production.conf /etc/nginx/sites-available/default.conf
-  fi
-  if [ -f /var/www/html/conf/nginx/nginx-site-ssl-production.conf ]; then
-    cp /var/www/html/conf/nginx/nginx-site-ssl-production.conf /etc/nginx/sites-available/default-ssl.conf
-  fi
-else
-  if [ -f /var/www/html/conf/nginx/nginx-site.conf ]; then
-    cp /var/www/html/conf/nginx/nginx-site.conf /etc/nginx/sites-available/default.conf
-  fi
-  if [ -f /var/www/html/conf/nginx/nginx-site-ssl.conf ]; then
-    cp /var/www/html/conf/nginx/nginx-site-ssl.conf /etc/nginx/sites-available/default-ssl.conf
-  fi
+if [ -f /var/www/html/conf/nginx/nginx-site.conf ]; then
+  cp /var/www/html/conf/nginx/nginx-site.conf /etc/nginx/sites-available/default.conf
+fi
+if [ -f /var/www/html/conf/nginx/nginx-site-ssl.conf ]; then
+  cp /var/www/html/conf/nginx/nginx-site-ssl.conf /etc/nginx/sites-available/default-ssl.conf
 fi
 
 # Display PHP error's or not
